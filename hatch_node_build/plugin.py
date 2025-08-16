@@ -74,16 +74,31 @@ class NodeBuildHook(BuildHookInterface):
                 raise RuntimeError(
                     f"[hatch-node-build] Index template '{index_template}' does not exist"
                 )
-            tag = f'<script src="{self.plugin_config.artifact_dir}/bundle.js"></script>'
             index_content = index_template.read_text()
-            bundle = bundled_dir / "bundle.js"
-            index_content = index_content.replace(
-                tag, f"<script>{bundle.read_text()}</script>"
-            )
+            js_bundle = bundled_dir / "bundle.js"
+            if js_bundle.exists():
+                index_content = index_content.replace(
+                    "<script data-bundle-js></script>",
+                    f"<script>{js_bundle.read_text()}</script>",
+                )
+                js_bundle.unlink()
+            else:
+                raise RuntimeError(
+                    f"Inlining failed. Bundle file '{js_bundle}' not found"
+                )
+
+            css_bundle = bundled_dir / "bundle.css"
+            if css_bundle.exists():
+                index_content = index_content.replace(
+                    "<style data-bundle-css></style>",
+                    f"<style>{css_bundle.read_text()}</style>",
+                )
+                css_bundle.unlink()
+
             bundle_index = bundled_dir / "index.html"
             bundle_index.write_text(index_content)
-            bundle.unlink()
-            self.app.display_info(f"Inline bundle written to '{bundle_index}'")
+            self.app.display_info(f"Inlined bundle index written to '{bundle_index}'")
+
         self.app.display_success("hatch-node-build finished successfully")
 
     def prepare_plugin_config(self):

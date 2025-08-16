@@ -74,7 +74,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 ```
 
-After the build, the Python package would include `bundle/app.js`. See [Runtime](#runtime) for more information on
+After the build, the Python package would include `bundle/bundle.js`. See [Runtime](#runtime) for more information on
 different ways to launch your JavaScript bundle when a user uses your package.
 
 ## Build & build configuration
@@ -128,9 +128,7 @@ applications to inline the JavaScript bundle in an HTML file and have the user's
 ### Inlining the bundle
 
 `hatch-node-build` supports simple inlining of your built bundle if the `inline_bundle` setting is turned on. It will look
-for a file called `index.html` in the source directory, and will replace the script tag that points to `{artifact_dir}/bundle.js`.
-
-For example:
+for a file called `index.html` in the source directory, and will inline the JavaScript and CSS bundles into the placeholders:
 
 ```
 /
@@ -138,6 +136,7 @@ For example:
 │  └─ __init__.py
 └─ browser/
    ├─ src/
+   │  ├─ index.css
    │  └─ index.jsx
    │  index.html
    └─ package.json
@@ -149,10 +148,11 @@ For example:
   <head>
     <meta charset="UTF-8" />
     <title>Sample React App</title>
+    <style data-bundle-css></style>
   </head>
   <body>
     <div id="root"></div>
-    <script src="dist/bundle.js"></script>
+    <script data-bundle-js></script>
   </body>
 </html>
 
@@ -168,6 +168,10 @@ webbrowser.open(pathlib.Path(__file__).parent / "bundle" / "index.html")
 ```
 
 Your code will not block and simply continue its execution.
+
+> [!TIP]
+> 
+> If you want to check whether inlining worked, the `data-bundle-*` attribute will have been stripped.
 
 ### Running through an HTTP server
 
