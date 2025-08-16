@@ -1,6 +1,8 @@
 import glob
 import json
+import platform
 import shutil
+import sys
 from pathlib import Path
 from subprocess import run
 
@@ -18,7 +20,6 @@ class NodeBuildHook(BuildHookInterface):
         super().__init__(*args, **kwargs)
         self.plugin_config: NodeBuildConfiguration = None
         self.node_executable: str = None
-        self.npm_executable: str = None
         self.node_cache = NodeCache()
 
     def initialize(self, version, build_data):
@@ -109,7 +110,6 @@ class NodeBuildHook(BuildHookInterface):
             else:
                 self.node_executable = self.plugin_config.node_executable
 
-            self.npm_executable = Path(self.node_executable).parent / "npm"
             self.app.display_info(
                 f"Found Node.js {node_version}: '{self.node_executable}'"
             )
@@ -122,7 +122,6 @@ class NodeBuildHook(BuildHookInterface):
             if node_version is None:
                 raise RuntimeError(f"Cached node '{self.node_executable}' not runnable")
 
-            self.npm_executable = Path(self.node_executable).parent / "npm"
             self.app.display_info(
                 f"Found cached Node.js {node_version}: '{self.node_executable}'"
             )
@@ -133,14 +132,13 @@ class NodeBuildHook(BuildHookInterface):
         self.node_executable = self.node_cache.install(
             required_engine, self.plugin_config.lts, self.app
         )
-        node_version = get_node_executable_version(self.node_executable)
+        node_version = get_node_executable_version(self.node_executable, r=True)
         if node_version is None:
             raise RuntimeError(
                 node_description
                 + f" installation failed: '{self.node_executable}' not runnable"
             )
         self.app.display_warning(node_description + " not found.")
-        self.npm_executable = Path(self.node_executable).parent / "npm"
         self.app.display_info(
             f"Using installed Node.js {node_version}: '{self.node_executable}'"
         )
@@ -163,7 +161,8 @@ class NodeBuildHook(BuildHookInterface):
     def format_tokens(self, command: list[str]):
         tokens = {
             "node": self.node_executable,
-            "npm": self.npm_executable,
+            "npm": Path(self.node_executable).parent
+            / ("npm.cmd" if sys.platform == "win32" else "npm"),
         }
         return [token.format(**tokens) for token in command]
 
