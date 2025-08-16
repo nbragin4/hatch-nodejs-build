@@ -19,12 +19,12 @@ build-backend = "hatchling.build"
 ```
 
 Including simply the table header as shown here is valid minimal TOML to enable the hook. Additional
-configuration of the plugin is added here as well.
+[configuration](#build--build-configuration) of the plugin is added here as well.
 
 ## Usage
 
-The plugin allows you to build a JavaScript bundle with `npm run build` (by default, see configuration). Simply
-include your Node assets in a folder called `/browser`, and it will be included in your Python package.
+The plugin allows you to build a JavaScript bundle with `npm run build` (by default, see [configuration](#build--build-configuration)).
+Include your Node assets in a folder called `/browser`, and it will be included in your Python package.
 
 A minimal [React](https://react.dev/) app using [`esbuild`](https://esbuild.github.io/) would look as follows:
 
@@ -131,6 +131,17 @@ applications to inline the JavaScript bundle in an HTML file and have the user's
 for a file called `index.html` in the source directory, and will replace the script tag that points to `{artifact_dir}/bundle.js`.
 
 For example:
+
+```
+/
+├─ my_python_module/
+│  └─ __init__.py
+└─ browser/
+   ├─ src/
+   │  └─ index.jsx
+   │  index.html
+   └─ package.json
+```
 
 ```html
 <!DOCTYPE html>
