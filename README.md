@@ -26,7 +26,7 @@ configuration of the plugin is added here as well.
 The plugin allows you to build a JavaScript bundle with `npm run build` (by default, see configuration). Simply
 include your Node assets in a folder called `/browser`, and it will be included in your Python package.
 
-A minimal [React]() app using `esbuild` would look as follows:
+A minimal [React](https://react.dev/) app using [`esbuild`](https://esbuild.github.io/) would look as follows:
 
 ```
 /
@@ -38,7 +38,7 @@ A minimal [React]() app using `esbuild` would look as follows:
    └─ package.json
 ```
 
-### package.json
+### `browser/package.json`
 
 ```json
 {
@@ -47,7 +47,7 @@ A minimal [React]() app using `esbuild` would look as follows:
   "description": "A minimal React app using ESBuild",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/index.jsx --bundle --outfile=dist/bundle.js --format=iife",
+    "build": "esbuild src/index.jsx --bundle --outfile=dist/bundle.js --format=iife --minify",
     "watch": "esbuild src/index.jsx --bundle --outfile=dist/bundle.js --format=iife --sourcemap --watch"
   },
   "dependencies": {
@@ -60,8 +60,9 @@ A minimal [React]() app using `esbuild` would look as follows:
 }
 ```
 
+### `browser/src/index.jsx`
+
 ```js
-// index.jsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -73,7 +74,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 ```
 
-After the build, the Python package would include `bundle/app.js`. See `Runtime` for more information on
+After the build, the Python package would include `bundle/app.js`. See [Runtime](#runtime) for more information on
 different ways to launch your JavaScript bundle when a user uses your package.
 
 ## Build & build configuration

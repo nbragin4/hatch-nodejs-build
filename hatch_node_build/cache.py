@@ -24,20 +24,40 @@ class NodeCache:
 
     def has(self, required_version: str | None):
         if not required_version:
-            return bool(self._get_all())
+            return bool(self._get_all_versions())
         else:
             return any(
-                node_matches(version, required_version) for version in self._get_all()
+                node_matches(version, required_version)
+                for version in self._get_all_versions()
             )
 
     def get(self, required_version: str | None):
-        return max(self._get_all())
+        executables = {
+            node_version: node / "bin" / "node"
+            for node in self._get_all()
+            if node_matches(
+                node_version := semantic_version.Version(node.name.split("-")[1][1:]),
+                required_version,
+            )
+        }
+        return executables[max(executables)]
+
+    def _get_all_versions(self):
+        return [
+            semantic_version.Version(directory.name.split("-")[1][1:])
+            for directory in self._get_all()
+        ]
 
     def _get_all(self):
         return [
-            semantic_version.Version(splits[1][1:])
+            self.cache_dir / directory
             for directory in os.listdir(self.cache_dir)
-            if len(splits := directory.split("-")) > 1 and splits[0] == "node"
+            if directory.startswith("node-")
+            and not (
+                directory.endswith(".zip")
+                or directory.endswith(".tar.gz")
+                or directory.endswith(".tar.xz")
+            )
         ]
 
     @cached_property
