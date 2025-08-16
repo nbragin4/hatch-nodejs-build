@@ -48,6 +48,7 @@ dependencies = [
 version = "0.1.0"
 
 [project.urls]
+Documentation = "https://github.com/Helveg/hatch-node-build?tab=readme-ov-file#hatch-node-build"
 History = "https://github.com/helveg/hatch-node-build/commits/main"
 Issues = "https://github.com/helveg/hatch-node-build/issues"
 Source = "https://github.com/helveg/hatch-node-build"

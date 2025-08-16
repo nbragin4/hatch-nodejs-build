@@ -8,6 +8,7 @@ from pathlib import Path
 
 import requests
 import semantic_version
+from hatchling.bridge.app import Application
 from platformdirs import user_cache_dir
 
 from hatch_node_build._util import node_matches
@@ -26,11 +27,18 @@ class NodeCache:
             return bool(self._get_all())
         else:
             return any(
-                node_matches(required_version, version) for version in self._get_all()
+                node_matches(version, required_version) for version in self._get_all()
             )
 
+    def get(self, required_version: str | None):
+        return max(self._get_all())
+
     def _get_all(self):
-        return os.listdir(self.cache_dir)
+        return [
+            semantic_version.Version(splits[1][1:])
+            for directory in os.listdir(self.cache_dir)
+            if len(splits := directory.split("-")) > 1 and splits[0] == "node"
+        ]
 
     @cached_property
     def node_releases(self):
@@ -61,7 +69,7 @@ class NodeCache:
 
         return max(versions, key=lambda v: semantic_version.Version(v[1:]))
 
-    def _download_and_extract_node(self, version):
+    def _download_and_extract_node(self, version, app: Application = None):
         """Downloads and extracts the Node.js binary for the specified version."""
         system = platform.system().lower()
         machine = platform.machine().lower()
@@ -101,16 +109,23 @@ class NodeCache:
                 )
             file_name = f"node-{version}-{candidates[0]}"
 
+        if app:
+            app.display_info(f"Downloading {file_name}...")
+
         url = f"https://nodejs.org/dist/{version}/{file_name}"
         archive_path = self.cache_dir / file_name
         if not archive_path.exists():
-            # print(f"Downloading {url}...")
+            if app:
+                app.display_waiting(f"Downloading {url}...")
             response = requests.get(url)
             response.raise_for_status()
             with open(archive_path, "wb") as f:
                 f.write(response.content)
+        elif app:
+            app.display_info(f"Using cached download '{file_name}'.")
 
-        # print(f"Extracting {archive_path}...")
+        if app:
+            app.display_waiting(f"Extracting {archive_path}...")
         if ext == ".zip":
             with zipfile.ZipFile(archive_path, "r") as zip_ref:
                 zip_ref.extractall(self.cache_dir)
@@ -121,14 +136,20 @@ class NodeCache:
         extracted_dir = self.cache_dir / f"node-{version}-{system}-{arch}"
         return extracted_dir
 
-    def install(self, required_engine, lts=True):
+    def install(self, required_engine, lts=True, app: Application = None):
         """Installs the appropriate Node.js version based on package.json's engines field."""
+        if app:
+            app.display_info("Looking Node.js version in online index:")
+            app.display_info(
+                "  Matching: " + required_engine if required_engine else "Any version"
+            )
+            app.display_info("  LTS only: " + "yes" if lts else "no")
 
         resolved_version = self._resolve_node_version(required_engine, lts)
-        # print(f"Resolved Node.js version: {resolved_version}")
 
-        node_dir = self._download_and_extract_node(resolved_version)
-        return node_dir / "bin"
+        if app:
+            app.display_info(f"Resolved Node.js version: {resolved_version}")
 
-        # print(f"Node.js {resolved_version} installed successfully.")
-        # print(f"Executable path: {bin_dir / 'node'}")
+        node_dir = self._download_and_extract_node(resolved_version, app)
+        app.display_info(f"Installed Node.js {resolved_version} to '{node_dir}'")
+        return node_dir / "bin" / "node"
