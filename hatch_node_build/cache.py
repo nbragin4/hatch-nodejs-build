@@ -20,7 +20,9 @@ class NodeCache:
 
     @cached_property
     def cache_dir(self):
-        return Path(user_cache_dir(self.app_name, ensure_exists=True))
+        return (
+            Path(user_cache_dir(self.app_name, ensure_exists=True)).absolute().resolve()
+        )
 
     def has(self, required_version: str | None):
         if not required_version:
