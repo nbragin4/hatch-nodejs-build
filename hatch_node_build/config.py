@@ -1,8 +1,7 @@
 from pathlib import Path
-from typing import Annotated, Literal, Union
+from typing import Annotated
 
-from pydantic import BeforeValidator, BaseModel, ConfigDict, Field
-from pydantic.alias_generators import to_snake
+from pydantic import BeforeValidator, BaseModel, ConfigDict
 
 
 def validate_and_split(value: str) -> list[str]:
