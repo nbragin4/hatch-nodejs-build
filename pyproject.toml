@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling>=1.12.2"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+package = ["hatch_node_build"]
+
+[tool.hatch.build.targets.sdist]
+package = ["hatch_node_build"]
+
+[project]
+name = "hatch-node-build"
+description = "Hatch build hook plugin for Node.js builds"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+keywords = [
+  "build",
+  "hatch",
+  "node",
+  "nodejs",
+  "plugin",
+  "web",
+  "build",
+  "app"
+]
+authors = [
+  { name = "Robin De Schepper", email = "robin@alexandria.sc" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Framework :: Hatch",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Build Tools",
+]
+dependencies = [
+  "black>=25.1.0",
+  "hatchling>=1.12.2",
+  "pydantic>=2.0",
+  "semantic-version>=2.10.0",
+  "requests>=2.30.0"
+]
+version = "0.1.0"
+
+[project.urls]
+History = "https://github.com/helveg/hatch-node-build/commits/main"
+Issues = "https://github.com/helveg/hatch-node-build/issues"
+Source = "https://github.com/helveg/hatch-node-build"
+
+[project.entry-points.hatch]
+node-build = "hatch_node_build.hooks"
+
+[tool.ruff]
+target-version = "py37"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "A",
+  "B",
+  "C",
+  "E",
+  "F",
+  "FBT",
+  "I",
+  "N",
+  "Q",
+  "RUF",
+  "S",
+  "T",
+  "UP",
+  "W",
+  "YTT",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["hatch_node_build"]
