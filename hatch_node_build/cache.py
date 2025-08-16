@@ -121,9 +121,6 @@ class NodeCache:
         if sys.platform == "win32" or sys.platform == "darwin":
             candidate += f"-{ext}"
 
-        app.display_info(f"OG file name: {file_name}")
-        app.display_info(f"Candidate: {candidate}")
-        app.display_info(f"Files: {files}")
         if candidate not in files:
             raise RuntimeError(
                 f"No binary available for {platform_tag}-{arch} in Node.js {version}. Options: {files}"
@@ -159,11 +156,11 @@ class NodeCache:
     def install(self, required_engine, lts=True, app: Application = None):
         """Installs the appropriate Node.js version based on package.json's engines field."""
         if app:
-            app.display_info("Looking Node.js version in online index:")
+            app.display_info("Looking Node.js version in online index.")
             app.display_info(
-                "  Matching: " + required_engine if required_engine else "Any version"
+                "└─ Matching: " + required_engine if required_engine else "Any version"
             )
-            app.display_info("  LTS only: " + "yes" if lts else "no")
+            app.display_info("└─ LTS only: " + "yes" if lts else "no")
 
         resolved_version = self._resolve_node_version(required_engine, lts)
 
