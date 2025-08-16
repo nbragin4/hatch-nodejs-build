@@ -1,6 +1,6 @@
-import json
 import os
 import platform
+import sys
 import tarfile
 import zipfile
 from functools import cached_property
@@ -35,7 +35,7 @@ class NodeCache:
 
     def get(self, required_version: str | None):
         executables = {
-            node_version: node / "bin" / "node"
+            node_version: _get_node_dir_executable(node)
             for node in self._get_all()
             if node_matches(
                 node_version := semantic_version.Version(node.name.split("-")[1][1:]),
@@ -93,7 +93,6 @@ class NodeCache:
 
     def _download_and_extract_node(self, version, app: Application = None):
         """Downloads and extracts the Node.js binary for the specified version."""
-        system = platform.system().lower()
         machine = platform.machine().lower()
         release_info = next(r for r in self.node_releases if r["version"] == version)
         files = release_info["files"]
@@ -108,28 +107,27 @@ class NodeCache:
         else:
             raise RuntimeError(f"Unsupported architecture: {machine}")
 
-        if system == "windows":
-            ext = ".zip"
-            file_name = f"node-{version}-win-{arch}{ext}"
-        elif system == "darwin":
-            ext = ".tar.gz"
-            file_name = f"node-{version}-darwin-{arch}{ext}"
+        if sys.platform == "win32":
+            ext = "zip"
+            platform_tag = "win"
+        elif sys.platform == "darwin":
+            ext = "tar.gz"
+            platform_tag = "osx"
         else:  # assume linux
-            ext = ".tar.xz"
-            file_name = f"node-{version}-linux-{arch}{ext}"
+            ext = "tar.xz"
+            platform_tag = "linux"
+        file_name = f"node-{version}-{platform_tag}-{arch}.{ext}"
+        candidate = f"{platform_tag}-{arch}"
+        if sys.platform == "win32" or sys.platform == "darwin":
+            candidate += f"-{ext}"
 
-        if file_name.replace(f"node-{version}-", "").replace(ext, "") not in files:
-            # fallback: pick any available matching system/arch from files
-            candidates = [
-                f
-                for f in files
-                if f.startswith(f"{system}-") or f.startswith(f"{system}-{arch}")
-            ]
-            if not candidates:
-                raise RuntimeError(
-                    f"No binary available for {system}-{arch} in Node.js {version}"
-                )
-            file_name = f"node-{version}-{candidates[0]}"
+        app.display_info(f"OG file name: {file_name}")
+        app.display_info(f"Candidate: {candidate}")
+        app.display_info(f"Files: {files}")
+        if candidate not in files:
+            raise RuntimeError(
+                f"No binary available for {platform_tag}-{arch} in Node.js {version}. Options: {files}"
+            )
 
         if app:
             app.display_info(f"Downloading {file_name}...")
@@ -148,14 +146,14 @@ class NodeCache:
 
         if app:
             app.display_waiting(f"Extracting {archive_path}...")
-        if ext == ".zip":
+        if ext == "zip":
             with zipfile.ZipFile(archive_path, "r") as zip_ref:
                 zip_ref.extractall(self.cache_dir)
         else:
             with tarfile.open(archive_path, "r:xz") as tar_ref:
                 tar_ref.extractall(self.cache_dir)
 
-        extracted_dir = self.cache_dir / f"node-{version}-{system}-{arch}"
+        extracted_dir = self.cache_dir / file_name.replace(f".{ext}", "")
         return extracted_dir
 
     def install(self, required_engine, lts=True, app: Application = None):
@@ -174,4 +172,8 @@ class NodeCache:
 
         node_dir = self._download_and_extract_node(resolved_version, app)
         app.display_info(f"Installed Node.js {resolved_version} to '{node_dir}'")
-        return node_dir / "bin" / "node"
+        return _get_node_dir_executable(node_dir)
+
+
+def _get_node_dir_executable(node_dir: Path) -> Path:
+    return node_dir / ("node.exe" if sys.platform == "win32" else "bin/node")
