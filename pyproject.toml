@@ -28,7 +28,7 @@ authors = [
   { name = "Robin De Schepper", email = "robin@alexandria.sc" },
 ]
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
   "Framework :: Hatch",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3.9",
@@ -44,7 +44,7 @@ dependencies = [
   "semantic-version>=2.10.0",
   "requests>=2.30.0"
 ]
-version = "0.1.0"
+version = "1.0.0"
 
 [project.urls]
 Documentation = "https://github.com/Helveg/hatch-node-build?tab=readme-ov-file#hatch-node-build"
