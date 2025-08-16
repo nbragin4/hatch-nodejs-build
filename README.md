@@ -12,7 +12,7 @@ dependency, and as a Hatch build hook:
 
 ```toml
 [build-system]
-requires = ["hatchling", "hatch-build-scripts"]
+requires = ["hatchling", "hatch-node-build"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.hooks.node-build]
