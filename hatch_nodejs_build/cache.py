@@ -11,12 +11,12 @@ import semantic_version
 from hatchling.bridge.app import Application
 from platformdirs import user_cache_dir
 
-from hatch_node_build._util import node_matches
+from hatch_nodejs_build._util import node_matches
 
 
 class NodeCache:
     def __init__(self):
-        self.app_name = "hatch-node-build"
+        self.app_name = "hatch-nodejs-build"
 
     @cached_property
     def cache_dir(self):

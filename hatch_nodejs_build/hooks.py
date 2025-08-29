@@ -1,8 +1,8 @@
 from hatchling.plugin import hookimpl
 
-from .plugin import NodeBuildHook
+from .plugin import NodeJsBuildHook
 
 
 @hookimpl
 def hatch_register_build_hook():
-    return NodeBuildHook
+    return NodeJsBuildHook

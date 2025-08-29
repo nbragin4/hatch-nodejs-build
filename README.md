@@ -1,21 +1,21 @@
-# Hatch Node Build
+# Hatch NodeJS Build
 
-[![PyPI - Version](https://img.shields.io/pypi/v/hatch_node_build.svg)](https://pypi.org/project/hatch_node_build)
+[![PyPI - Version](https://img.shields.io/pypi/v/hatch_nodejs_build.svg)](https://pypi.org/project/hatch_nodejs_build)
 
 A plugin for [Hatch](https://github.com/pypa/hatch) that allows you to run Node.js builds and include the build
 artifacts in your Python package.
 
 ## Installation
 
-To set up `hatch-node-build`, set `hatchling` as your build backend, and add `hatch-node-build` as a
+To set up `hatch-nodejs-build`, set `hatchling` as your build backend, and add `hatch-nodejs-build` as a
 dependency, and as a Hatch build hook:
 
 ```toml
 [build-system]
-requires = ["hatchling", "hatch-node-build"]
+requires = ["hatchling", "hatch-nodejs-build"]
 build-backend = "hatchling.build"
 
-[tool.hatch.build.hooks.node-build]
+[tool.hatch.build.hooks.nodejs-build]
 ```
 
 Including simply the table header as shown here is valid minimal TOML to enable the hook. Additional
@@ -107,18 +107,18 @@ The build can be configured in the following ways:
 If you need to make changes to the configuration, specify them in the build hook configuration:
 
 ```toml
-[tool.hatch.build.hooks.node-build]
+[tool.hatch.build.hooks.nodejs-build]
 source_dir = "src/web"
 bundle_dir = "web"
 ```
 
 ## Runtime
 
-Using `hatch-node-build` you can include the bundle in your package, but that doesn't open the app yet when someone
+Using `hatch-nodejs-build` you can include the bundle in your package, but that doesn't open the app yet when someone
 uses your package.
 
 There are a few things to consider, for example, the user's target machine might not have the Node.js runtime available,
-so `hatch-node-build` works best, and focuses on frontend application bundles to be run in the browser.
+so `hatch-nodejs-build` works best, and focuses on frontend application bundles to be run in the browser.
 
 Most web bundlers create bundles that span multiple files/chunks so that the web app can be loaded incrementally for
 faster load times, and the bundle has to be served from an HTTP server. Spawning and controlling an HTTP server from
@@ -127,7 +127,7 @@ applications to inline the JavaScript bundle in an HTML file and have the user's
 
 ### Inlining the bundle
 
-`hatch-node-build` supports simple inlining of your built bundle if the `inline_bundle` setting is turned on. It will look
+`hatch-nodejs-build` supports simple inlining of your built bundle if the `inline_bundle` setting is turned on. It will look
 for a file called `index.html` in the source directory, and will inline the JavaScript and CSS bundles into the placeholders:
 
 ```

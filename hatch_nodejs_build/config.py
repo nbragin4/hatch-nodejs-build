@@ -15,7 +15,7 @@ def validate_and_split(value: str) -> list[str]:
 type Command = Annotated[list[str], BeforeValidator(validate_and_split)]
 
 
-class NodeBuildConfiguration(BaseModel):
+class NodeJsBuildConfiguration(BaseModel):
     model_config = ConfigDict(
         extra="forbid", alias_generator=lambda x: x.replace("_", "-")
     )

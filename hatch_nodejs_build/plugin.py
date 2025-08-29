@@ -8,23 +8,23 @@ from subprocess import run
 
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
-from hatch_node_build._util import node_matches, get_node_executable_version
-from hatch_node_build.cache import NodeCache
-from hatch_node_build.config import NodeBuildConfiguration
+from hatch_nodejs_build._util import node_matches, get_node_executable_version
+from hatch_nodejs_build.cache import NodeCache
+from hatch_nodejs_build.config import NodeJsBuildConfiguration
 
 
-class NodeBuildHook(BuildHookInterface):
-    PLUGIN_NAME = "node-build"
+class NodeJsBuildHook(BuildHookInterface):
+    PLUGIN_NAME = "nodejs-build"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.plugin_config: NodeBuildConfiguration = None
+        self.plugin_config: NodeJsBuildConfiguration = None
         self.node_executable: str = None
         self.node_cache = NodeCache()
 
     def initialize(self, version, build_data):
         self.prepare_plugin_config()
-        self.app.display_mini_header("hatch-node-build")
+        self.app.display_mini_header("hatch-nodejs-build")
         self.app.display_info(
             f"Configuration:\n{self.plugin_config.model_dump_json(indent=2)}"
         )
@@ -44,7 +44,7 @@ class NodeBuildHook(BuildHookInterface):
 
         if not artifact_list:
             raise RuntimeError(
-                f"[hatch-node-build] no artifacts found in '{artifact_dir}'"
+                f"[hatch-nodejs-build] no artifacts found in '{artifact_dir}'"
             )
 
         self.app.display_info(
@@ -72,7 +72,7 @@ class NodeBuildHook(BuildHookInterface):
             index_template = self.plugin_config.source_dir / "index.html"
             if not index_template.exists():
                 raise RuntimeError(
-                    f"[hatch-node-build] Index template '{index_template}' does not exist"
+                    f"[hatch-nodejs-build] Index template '{index_template}' does not exist"
                 )
             index_content = index_template.read_text()
             js_bundle = bundled_dir / "bundle.js"
@@ -99,10 +99,10 @@ class NodeBuildHook(BuildHookInterface):
             bundle_index.write_text(index_content)
             self.app.display_info(f"Inlined bundle index written to '{bundle_index}'")
 
-        self.app.display_success("hatch-node-build finished successfully")
+        self.app.display_success("hatch-nodejs-build finished successfully")
 
     def prepare_plugin_config(self):
-        self.plugin_config = NodeBuildConfiguration(**self.config)
+        self.plugin_config = NodeJsBuildConfiguration(**self.config)
 
     def require_node(self):
         package = self.get_package_json()
@@ -147,7 +147,7 @@ class NodeBuildHook(BuildHookInterface):
         self.node_executable = self.node_cache.install(
             required_engine, self.plugin_config.lts, self.app
         )
-        node_version = get_node_executable_version(self.node_executable, r=True)
+        node_version = get_node_executable_version(self.node_executable)
         if node_version is None:
             raise RuntimeError(
                 node_description
@@ -164,7 +164,7 @@ class NodeBuildHook(BuildHookInterface):
             return json.loads(package_json_path.read_text())
         except FileNotFoundError:
             raise Exception(
-                f"[hatch-node-build] package.json not found in source directory '{package_json_path.absolute()}'"
+                f"[hatch-nodejs-build] package.json not found in source directory '{package_json_path.absolute()}'"
             )
 
     def run_install_command(self):
@@ -193,5 +193,5 @@ class NodeBuildHook(BuildHookInterface):
             cwd=cwd,
             check=True,
         )
-        self.app.display_mini_header(f"hatch-node-build")
+        self.app.display_mini_header(f"hatch-nodejs-build")
         self.app.display_info(f"{tag.title()} command finished.")

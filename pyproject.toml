@@ -3,13 +3,13 @@ requires = ["hatchling>=1.12.2"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-package = ["hatch_node_build"]
+package = ["hatch_nodejs_build"]
 
 [tool.hatch.build.targets.sdist]
-package = ["hatch_node_build"]
+package = ["hatch_nodejs_build"]
 
 [project]
-name = "hatch-node-build"
+name = "hatch-nodejs-build"
 description = "Hatch build hook plugin for Node.js builds"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -44,16 +44,21 @@ dependencies = [
   "semantic-version>=2.10.0",
   "requests>=2.30.0"
 ]
-version = "1.1.0"
+version = "1.1.1"
 
 [project.urls]
-Documentation = "https://github.com/Helveg/hatch-node-build?tab=readme-ov-file#hatch-node-build"
-History = "https://github.com/helveg/hatch-node-build/commits/main"
-Issues = "https://github.com/helveg/hatch-node-build/issues"
-Source = "https://github.com/helveg/hatch-node-build"
+Documentation = "https://github.com/Helveg/hatch-nodejs-build?tab=readme-ov-file#hatch-nodejs-build"
+History = "https://github.com/helveg/hatch-nodejs-build/commits/main"
+Issues = "https://github.com/helveg/hatch-nodejs-build/issues"
+Source = "https://github.com/helveg/hatch-nodejs-build"
 
 [project.entry-points.hatch]
-node-build = "hatch_node_build.hooks"
+nodejs-build = "hatch_nodejs_build.hooks"
+
+[dependency-groups]
+dev = [
+    "hatch>=1.14.1",
+]
 
 [tool.ruff]
 target-version = "py37"
@@ -79,4 +84,4 @@ select = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["hatch_node_build"]
+known-first-party = ["hatch_nodejs_build"]
