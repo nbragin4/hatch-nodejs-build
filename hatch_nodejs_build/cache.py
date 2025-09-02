@@ -42,6 +42,8 @@ class NodeCache:
                 required_version,
             )
         }
+        if not executables:
+            raise KeyError(f"No matching Node.js version found for requirement: {required_version}")
         return executables[max(executables)]
 
     def _get_all_versions(self):

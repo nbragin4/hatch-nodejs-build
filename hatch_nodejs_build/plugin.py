@@ -1,6 +1,5 @@
 import glob
 import json
-import platform
 import shutil
 import sys
 from pathlib import Path
@@ -8,7 +7,7 @@ from subprocess import run
 
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 
-from hatch_nodejs_build._util import node_matches, get_node_executable_version
+from hatch_nodejs_build._util import get_node_executable_version, node_matches
 from hatch_nodejs_build.cache import NodeCache
 from hatch_nodejs_build.config import NodeJsBuildConfiguration
 
@@ -114,7 +113,7 @@ class NodeJsBuildHook(BuildHookInterface):
 
         # Find Node.js from the configured executable, or on PATH
         node_version = get_node_executable_version(
-            self.plugin_config.node_executable or "node2"
+            self.plugin_config.node_executable or "node"
         )
 
         # Check if it matches the possible requirement in package.json
@@ -176,8 +175,10 @@ class NodeJsBuildHook(BuildHookInterface):
     def format_tokens(self, command: list[str]):
         tokens = {
             "node": self.node_executable,
-            "npm": Path(self.node_executable).parent
-            / ("npm.cmd" if sys.platform == "win32" else "npm"),
+            "npm": str(
+                Path(self.node_executable).parent
+                / ("npm.cmd" if sys.platform == "win32" else "npm")
+            ),
         }
         return [token.format(**tokens) for token in command]
 

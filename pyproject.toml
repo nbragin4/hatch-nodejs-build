@@ -57,7 +57,11 @@ nodejs-build = "hatch_nodejs_build.hooks"
 
 [dependency-groups]
 dev = [
-    "hatch>=1.14.1",
+  "hatch>=1.14.1",
+  "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
+  "pytest-mock>=3.14.1",
+  "requests-mock>=1.12.1"
 ]
 
 [tool.ruff]
@@ -85,3 +89,32 @@ select = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["hatch_nodejs_build"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--disable-warnings",
+    "--color=yes",
+    "--durations=10",
+    "--cov=hatch_nodejs_build",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=80"
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "network: marks tests that require network access"
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]

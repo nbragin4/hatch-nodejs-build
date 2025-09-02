@@ -1,12 +1,14 @@
 from pathlib import Path
 from typing import Annotated
 
-from pydantic import BeforeValidator, BaseModel, ConfigDict
+from pydantic import BaseModel, BeforeValidator, ConfigDict
 
 
-def validate_and_split(value: str) -> list[str]:
+def validate_and_split(value: str | list[str]) -> list[str]:
+    if isinstance(value, list):
+        return [ str(i) for i in value]
     if not isinstance(value, str):
-        raise ValueError("Must be a string")
+        raise ValueError("Must be a string or list of strings")
     if not value.strip():
         raise ValueError("Cannot be empty")
     return value.split(",")
